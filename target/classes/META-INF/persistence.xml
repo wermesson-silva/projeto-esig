@@ -9,7 +9,7 @@
         <!-- Datasource configurado no JBoss -->
         <jta-data-source>java:/gestao-tarefasDS</jta-data-source>
 
-        <!-- Sua entidade -->
+        <!-- Entidade utilizada -->
         <class>br.com.esig.crud.model.Tarefa</class>
 
         <properties>
