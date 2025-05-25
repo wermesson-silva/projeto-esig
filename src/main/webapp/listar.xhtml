@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      
+<h:head>
+	<meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Listar Tarefas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous"/>
+</h:head>
+<h:body>
+
+	<h:form styleClass="container my-4">
+		<div class="mb-2">
+			<h:outputLabel styleClass="form-label" value="Número:" />
+			<h:inputText styleClass="form-control" value="#{tarefaBean.filtroNumero}" />
+		</div>
+		<div class="mb-2">
+			<h:outputLabel styleClass="form-label" value="Título/Descrição:" />
+			<h:inputTextarea styleClass="form-control" value="#{tarefaBean.filtroTituloDescricao}" rows="1"/>
+		</div>
+		<div class="row">
+			<div class="col">
+				<h:outputLabel styleClass="form-label" value="Responsável:" />
+				<h:inputText styleClass="form-control" value="#{tarefaBean.filtroResponsavel}" />
+			</div>
+			<div class="col">
+			 	<h:outputLabel for="filtroConcluida" styleClass="form-label" value="Situação:" />
+	            <h:selectOneMenu id="filtroConcluida" styleClass="form-select" value="#{tarefaBean.filtroConcluida}">
+	                <f:selectItem itemValue="false" itemLabel="Em andamento" />
+	                <f:selectItem itemValue="true" itemLabel="Concluída" />
+	            </h:selectOneMenu>
+			</div>
+			<div class="col d-flex align-items-end">
+				<h:commandButton styleClass="btn btn-primary" value="Buscar Tarefas" action="#{tarefaBean.buscar}" />
+			</div>
+		</div>
+            
+	</h:form>
+	
+	
+	<h:form styleClass="container my-5">
+	
+		<div class="row mb-2">
+			<div class="col-2">
+				Concluídas:
+				 <span class="badge text-bg-success rounded-pill">#{tarefaBean.totalConcluidas}</span>
+			</div>
+			<div class="col-2">
+				Em andamento:
+				 <span class="badge text-bg-primary rounded-pill">#{tarefaBean.totalAndamento}</span>
+			</div>
+		</div>
+    	
+       <h:dataTable styleClass="table text-start" value="#{tarefaBean.tarefas}" var="tarefa" border="1">
+            <h:column>
+                <f:facet name="header">Número</f:facet>
+                #{tarefa.id}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Título</f:facet>
+                #{tarefa.titulo}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Responsável</f:facet>
+                #{tarefa.responsavel}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Concluída</f:facet>
+                #{tarefa.concluida ? 'Sim' : 'Não'}
+            </h:column>
+            <h:column>
+	           	 	<f:facet name="header">Ações</f:facet>
+	                <h:commandLink styleClass="btn btn-sm btn-primary mx-1" value="Visualizar">
+    					<f:ajax execute="@this" render="modalForm" onevent="abrirModalDetalhar" listener="#{tarefaBean.detalhar(tarefa)}"/>
+					</h:commandLink>
+	                <h:commandLink styleClass="btn btn-sm btn-warning mx-1" value="Editar" action="#{tarefaBean.editar(tarefa)}"/>
+	                <h:commandLink styleClass="btn btn-sm btn-danger mx-1" value="Excluir" action="#{tarefaBean.excluir(tarefa)}" immediate="true"/>
+	                <h:commandLink styleClass="btn btn-sm btn-success mx-1"  rendered="#{tarefa.concluida == false}" value="Concluir" action="#{tarefaBean.concluir(tarefa)}" immediate="true"/>
+            </h:column>
+        </h:dataTable>
+        <h:commandLink styleClass="btn btn-outline-primary" value="Nova Tarefa" action="#{tarefaBean.formTarefa}" />
+        
+    </h:form>
+
+	<h:form id="modalForm">
+		<div class="modal fade" id="detalhar" tabindex="-1">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h:outputLabel styleClass="h3" value="#{tarefaBean.tarefa.titulo}" />
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<ul class="list-group">
+						  <li class="list-group-item">Número: #{tarefaBean.tarefa.id}</li>
+						  <li class="list-group-item">Descrição: #{tarefaBean.tarefa.descricao}</li>
+						  <li class="list-group-item">Responsável: #{tarefaBean.tarefa.responsavel}</li>
+						  <li class="list-group-item">Prioridade: #{tarefaBean.tarefa.prioridade}</li>
+						  <li class="list-group-item">Prazo: #{tarefaBean.tarefa.deadline}</li>
+						  <li class="list-group-item">Situação: #{tarefaBean.tarefa.concluida ? 'Concluída' : 'Em andamento'}</li>
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger"
+							data-bs-dismiss="modal">Fechar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</h:form>
+	
+ 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+ 	<script>
+ 	function abrirModalDetalhar(data) {
+ 	    if (data.status === "success") {
+ 	        var modalElement = document.getElementById('detalhar');
+ 	        var modal = new bootstrap.Modal(modalElement);
+ 	        modal.show();
+ 	    }
+ 	}
+ 	</script>
+</h:body>
+</html>
